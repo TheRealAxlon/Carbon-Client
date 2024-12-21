@@ -1,41 +1,61 @@
 @echo off
-title CARBON LOADER V1
+title CARBON lOADER V1 Unstable
 
-:: Set up a validation key
-set "carbon_key=UNIQUE-LOADER-KEY"
-set "carbon_temp_file=%temp%\carbon_loader.tmp"
-
-:: Write the validation key to a temp file
-echo %carbon_key% > "%carbon_temp_file%"
-
-:: Define the Carbon source URL
+:: Source Code
 set "pastebin_url=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/CarbonRaw.bat"
+
+
 set "target_dir=%userprofile%\Documents\CARBON"
 set "target_file=%target_dir%\CARBON_ClientAPP.bat"
+set "theme_file=%target_dir%\theme.txt"
 
-:: Create the target directory if it doesn't exist
-if not exist "%target_dir%" mkdir "%target_dir%"
 
-:: Check for internet connection
-echo Checking internet connection...
+set "default_color=05" :: Purple
+
+
+if not exist "%target_dir%" (
+    mkdir "%target_dir%"
+)
+
+
+if exist "%theme_file%" (
+    for /f "delims=" %%A in (%theme_file%) do set "theme_color=%%A"
+) else (
+    set "theme_color=%default_color%"
+)
+color %theme_color%
+
+
+echo loading.
 ping -n 1 google.com >nul 2>&1
 if errorlevel 1 (
-    echo No internet connection. The loader requires an internet connection to proceed.
+    echo No internet connection.  Loading save...
+    if exist "%target_file%" (
+        start "" "%target_file%"
+    ) else (
+        echo No Save
+    )
     pause
     exit
 )
 
-:: Download the latest Carbon source
-echo Downloading Carbon source...
+
+echo Loading..
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%pastebin_url%', '%target_file%')" >nul 2>&1
 
 :: Verify if the file downloaded successfully
 if not exist "%target_file%" (
-    echo Failed to download Carbon. Please try again later.
+    echo Loading...
+    if exist "%target_file%" (
+        start "" "%target_file%"
+    ) else (
+        echo Error 204
+    )
     pause
     exit
 )
 
-:: Launch Carbon with the validation key
+
+echo Running the latest version of CARBON.
 start "" "%target_file%"
 exit
