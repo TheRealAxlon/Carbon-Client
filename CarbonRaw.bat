@@ -5,7 +5,7 @@ chcp 65001 >nul
 cls
 
 :: Check if the CARBON folder exists in Documents, if not, create it
-set "folder=%USERPROFILE%\Documents\CARBON"
+set "folder=%USERPROFILE%\Documents\CARBON\Pref"
 if not exist "%folder%" mkdir "%folder%"
 
 :: Load saved theme settings if they exist
