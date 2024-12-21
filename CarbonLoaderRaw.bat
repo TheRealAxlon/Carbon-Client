@@ -5,9 +5,10 @@ title CARBON lOADER V1 Unstable
 set "pastebin_url=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/CarbonRaw.bat"
 
 
-set "target_dir=%userprofile%\Documents\CARBON"
+set "target_dir=%userprofile%\Documents\CARBON/Source"
+set "target_dip=%userprofile%\Documents\CARBON/Pref"
 set "target_file=%target_dir%\CARBON_ClientAPP.bat"
-set "theme_file=%target_dir%\theme.txt"
+set "theme_file=%target_dip%\theme.txt"
 
 
 set "default_color=05" :: Purple
