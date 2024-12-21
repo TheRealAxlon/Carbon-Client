@@ -7,7 +7,7 @@ set "pastebin_url=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/r
 
 set "target_dir=%userprofile%\Documents\CARBON\Source"
 set "target_dip=%userprofile%\Documents\CARBON\Pref"
-set "target_file=%target_dir%\CARBON_ClientAPP.bat"
+set "target_file=%target_dir%\CARBON_ClientLoad.bat"
 set "theme_file=%target_dip%\theme.txt"
 
 
