@@ -1,8 +1,37 @@
 @echo off
+title CARBON v1.1.3
+
+:: Verify the loader's validation key
+set "carbon_temp_file=%temp%\carbon_loader.tmp"
+
+if not exist "%carbon_temp_file%" (
+    echo ERROR: This program must be run through the official loader.
+    pause
+    exit
+)
+
+:: Read the key from the temp file
+set /p carbon_key=<"%carbon_temp_file%"
+
+:: Check if the key matches the expected value
+if not "%carbon_key%"=="UNIQUE-LOADER-KEY" (
+    echo ERROR: Validation failed. This program must be run through the official loader.
+    pause
+    exit
+)
+
+:: Clean up the temp file
+del "%carbon_temp_file%" >nul 2>&1
+
+:: Proceed with the rest of the script
 mode 80, 28
-title CARBON
 chcp 65001 >nul
 cls
+
+:: Your Carbon script continues here...
+echo Welcome to Carbon!
+pause
+
 
 :: Check if the CARBON folder exists in Documents, if not, create it
 set "folder=%USERPROFILE%\Documents\CARBON"
