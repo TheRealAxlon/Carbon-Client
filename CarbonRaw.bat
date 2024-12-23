@@ -44,9 +44,9 @@ ping localhost -n 1 >nul
 echo ·▀▀▀▀   ▀ • .▀    ▀  ▀  ▀▀▀▀  ▀▀▀▀
 ping localhost -n 1 >nul
 echo ============================
-echo         Carbon v1.1.3
+echo         Carbon v1.1.3 Beta
 echo ============================
-echo      Erm what the sigma 
+echo      Still In testing
 echo ============================
 echo     #═╦═══════»  [Settings]  [1]
 echo       ╚═╦══════»  [Tools]     [2]
