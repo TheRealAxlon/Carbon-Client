@@ -15,7 +15,7 @@ set "color_file=%foldero%\theme.txt"
 if exist "%color_file%" (
     for /f "delims=" %%A in (%color_file%) do set "theme_color=%%A"
 ) else (
-    set "theme_color=05" :: Default color if no theme is saved
+    set "theme_color=08" :: Default color if no theme is saved
 )
 
 :: Load time format settings if they exist
@@ -47,17 +47,16 @@ echo         Carbon v1.1.3
 echo ============================
 echo      Erm what the sigma 
 echo ============================
-ping localhost -n 2 >nul
 echo     #═╦═══════»  [Settings]  [1]
-ping localhost -n 1 >nul
 echo       ╚═╦══════»  [Tools]     [2]
-ping localhost -n 1 >nul
-echo         ╚═╦═════»  [Exit]      [3]
+echo         ╚═╦═════»   [Fun]      [3]
+echo           ╚═╦═════»  [Exit]     [4]
 echo ----------------------------
 set /p choice="Select an option: "
 if "%choice%"=="1" goto settings
 if "%choice%"=="2" goto tools
-if "%choice%"=="3" exit
+if "%choice%"=="3" goto fun
+if "%choice%"=="4" exit
 if /i "%choice%"=="DEV0" goto developer_settings
 
 :settings
@@ -77,6 +76,71 @@ set /p settings_choice="Select an option: "
 if "%settings_choice%"=="1" goto carbon_settings
 if "%settings_choice%"=="2" goto pc_settings
 if "%settings_choice%"=="3" goto start
+
+:Fun
+cls
+echo ============================
+echo          Fun
+echo ============================
+ping localhost -n 2 >nul
+echo     #═╦═══════»  [Soundboard] Beta [1]
+ping localhost -n 1 >nul
+echo       ╚═╦══════»  [Play Movie]     [2]
+ping localhost -n 1 >nul
+echo         ╚═╦═════»  [Back]           [3]
+ping localhost -n 1 >nul
+echo ----------------------------
+set /p settings_choice="Select an option: "
+if "%settings_choice%"=="1" goto Soundboard
+if "%settings_choice%"=="2" goto Movie
+if "%settings_choice%"=="3" goto start
+
+:clear_temp
+cls
+echo ============================
+echo        Clear Temp Folder
+cls
+echo ============================
+echo This will delete all files and subfolders in your temp folder.
+echo -----------------------------------------
+echo Temp Folder: %TEMP%
+echo -----------------------------------------
+set /p confirm="Do you want to proceed? (y/n): "
+if /i "%confirm%"=="y" (
+    echo Deleting files in %TEMP%...
+    rd /s /q "%TEMP%"
+    mkdir "%TEMP%" :: Recreate the temp folder
+    echo Temp folder cleared successfully.
+    pause
+    goto main
+) else (
+    echo Operation cancelled.
+    pause
+    goto main
+)
+
+
+:movie
+cls
+echo ============================
+echo          Movie Mode
+cls
+echo ============================
+echo Connecting to watch.ascii.theater...
+echo -----------------------------------------
+echo Ensure you have SSH installed and set up properly.
+echo -----------------------------------------
+pause
+
+:: Run the SSH command
+ssh -o StrictHostKeyChecking=no watch.ascii.theater
+
+echo -----------------------------------------
+echo Movie playback ended. Returning to main menu.
+pause
+goto main
+
+
 
 :carbon_settings
 cls
@@ -104,12 +168,14 @@ echo ============================
 ping localhost -n 2 >nul
 echo     #═╦═══════»  [Change Time Format]  [1]
 ping localhost -n 1 >nul
-echo       ╚═╦══════»  [Back]              [2]
+echo       ╚═╦══════»  [Clear Temp]          [2]
 ping localhost -n 1 >nul
+echo       ╚═╦══════»  [Back]                 [3]
 echo ----------------------------
 set /p pc_choice="Select an option: "
 if "%pc_choice%"=="1" goto change_time_format
-if "%pc_choice%"=="2" goto settings
+if "%pc_choice%"=="2" goto clear_temp
+if "%pc_choice%"=="3" goto settings
 
 :change_time_format
 cls
@@ -152,7 +218,7 @@ echo [3] Blue
 ping localhost -n 1 >nul
 echo [4] Yellow
 ping localhost -n 1 >nul
-echo [5] Magenta
+echo [5] Carbon
 echo ----------------------------
 set /p color_choice="Enter the number for the color: "
 
@@ -161,7 +227,7 @@ if "%color_choice%"=="1" set "theme_color=04"
 if "%color_choice%"=="2" set "theme_color=02"
 if "%color_choice%"=="3" set "theme_color=01"
 if "%color_choice%"=="4" set "theme_color=0E"
-if "%color_choice%"=="5" set "theme_color=05"
+if "%color_choice%"=="5" set "theme_color=8"
 
 :: Save the new theme color in a text file
 echo %theme_color% > "%color_file%"
@@ -316,7 +382,99 @@ if "%shutdown_time%" NEQ "" (
 ) else (
     echo Invalid input. No shutdown scheduled.
 )
+
+
+:soundboard
+cls
+echo ============================
+echo        Carbon Soundboard
+cls
+echo ============================
+echo This will allow you to play sounds through your mic.
+echo The sounds will be saved in DOCUMENTS/CARBON/Soundboard.
+echo -----------------------------------------
+echo Downloading sounds, please wait...
+
+:: Set up the directories
+set "soundboardDir=%USERPROFILE%\Documents\CARBON\Soundboard"
+if not exist "%soundboardDir%" mkdir "%soundboardDir%"
+
+:: URLs for the sound files
+set "sound1=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/main/Sounds/caramell.mp3"
+set "sound2=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/main/Sounds/F!EN.mp3"
+
+:: Download sounds
+curl -o "%soundboardDir%\caramell.mp3" %sound1%
+curl -o "%soundboardDir%\F!EN.mp3" %sound2%
+echo Sounds downloaded and saved in "%soundboardDir%".
 pause
-goto tools
+
+:soundboard
+cls
+echo ============================
+echo        Carbon Soundboard
+cls              Beta
+echo ============================
+echo This will allow you to play sounds through your current microphone.
+echo The sounds will be saved in DOCUMENTS/CARBON/Soundboard.
+echo -----------------------------------------
+echo Downloading sounds, please wait...
+
+:: Set up the directories
+set "soundboardDir=%USERPROFILE%\Documents\CARBON\Soundboard"
+if not exist "%soundboardDir%" mkdir "%soundboardDir%"
+
+:: URLs for the sound files
+set "sound1=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/main/Sounds/caramell.mp3"
+set "sound2=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/main/Sounds/F!EN.mp3"
+
+:: Download sounds
+curl -o "%soundboardDir%\caramell.mp3" %sound1%
+curl -o "%soundboardDir%\F!EN.mp3" %sound2%
+echo Sounds downloaded and saved in "%soundboardDir%".
+pause
+
+:menu
+cls
+echo ============================
+echo    Soundboard Menu Experemental
+echo ============================
+echo 1. Play Caramell
+echo 2. Play F!EN
+echo 3. Exit
+echo ============================
+set /p choice="Choose an option (1-3): "
+
+if "%choice%"=="1" (
+    call :playSound "%soundboardDir%\caramell.mp3"
+) else if "%choice%"=="2" (
+    call :playSound "%soundboardDir%\F!EN.mp3"
+) else if "%choice%"=="3" (
+    echo Exiting Soundboard...
+    exit
+) else (
+    echo Invalid choice. Try again.
+    pause
+    goto menu
+)
+
+:playSound
+cls
+if not exist "%~1" (
+    echo Error: File not found - "%~1"
+    pause
+    goto menu
+)
+
+echo Playing %~1 through your default media player...
+start wmplayer "%~1"
+pause
+goto menu
+
+
+
+
+
+
 
 
