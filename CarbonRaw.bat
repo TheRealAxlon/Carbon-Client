@@ -7,9 +7,10 @@ cls
 :: Check if the CARBON folder exists in Documents, if not, create it
 set "folder=%USERPROFILE%\Documents\CARBON"
 set "foldero=%USERPROFILE%\Documents\CARBON\Pref"
+set "addons_folder=%folder%\Addons"
 if not exist "%folder%" mkdir "%folder%"
 if not exist "%foldero%" mkdir "%foldero%"
-
+if not exist "%addons_folder%" mkdir "%addons_folder%"
 
 set "color_file=%foldero%\theme.txt"
 if exist "%color_file%" (
@@ -50,13 +51,15 @@ echo ============================
 echo     #═╦═══════»  [Settings]  [1]
 echo       ╚═╦══════»  [Tools]     [2]
 echo         ╚═╦═════»   [Fun]      [3]
-echo           ╚═╦═════»  [Exit]     [4]
+echo           ╚═╦═════»  [Addons]   [4]
+echo             ╚═╦═════» [Exit]     [5]
 echo ----------------------------
 set /p choice="Select an option: "
 if "%choice%"=="1" goto settings
 if "%choice%"=="2" goto tools
 if "%choice%"=="3" goto fun
-if "%choice%"=="4" exit
+if "%choice%"=="4" goto addons
+if "%choice%"=="5" exit
 if /i "%choice%"=="DEV0" goto developer_settings
 
 :settings
@@ -77,7 +80,7 @@ if "%settings_choice%"=="1" goto carbon_settings
 if "%settings_choice%"=="2" goto pc_settings
 if "%settings_choice%"=="3" goto start
 
-:Fun
+:fun
 cls
 echo ============================
 echo          Fun
@@ -87,13 +90,63 @@ echo     #═╦═══════»  [Soundboard] Beta [1]
 ping localhost -n 1 >nul
 echo       ╚═╦══════»  [Play Movie]     [2]
 ping localhost -n 1 >nul
-echo         ╚═╦═════»  [Back]           [3]
+echo         ╚═╦═════»  [Back]          [3]
 ping localhost -n 1 >nul
 echo ----------------------------
 set /p settings_choice="Select an option: "
 if "%settings_choice%"=="1" goto Soundboard
 if "%settings_choice%"=="2" goto Movie
 if "%settings_choice%"=="3" goto start
+
+:addons
+cls
+echo ============================
+echo          Addons
+echo ============================
+
+
+:: List available addons
+setlocal enabledelayedexpansion
+set /a count=0
+for %%A in ("%addons_folder%\*.bat") do (
+    set /a count+=1
+    echo [!count!] %%~nA
+    set "addon!count!=%%A"
+)
+
+:: Add option to open Addons folder
+set /a count+=1
+echo [!count!] Open Addons Folder
+
+:: Add option to return to the main menu
+set /a count+=1
+echo [!count!] Back to Main Menu
+
+:: Prompt user for choice
+set /p addon_choice="Select an option: "
+if "!addon_choice!"=="%count%" goto start
+if "!addon_choice!"=="%count%-1" (
+    echo Opening Addons folder...
+    start "" "%addons_folder%"
+    pause
+    goto addons
+)
+
+:: Run the selected addon
+for /L %%I in (1,1,%count%-2) do (
+    if "!addon_choice!"=="%%I" (
+        echo Running addon: !addon%%I!
+        call "!addon%%I!"
+        pause
+        goto addons
+    )
+)
+
+:: Invalid option handling
+echo Invalid option. Please try again.
+pause
+goto addons
+
 
 :clear_temp
 cls
