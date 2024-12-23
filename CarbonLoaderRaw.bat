@@ -1,7 +1,7 @@
 @echo off
 title CARBON lOADER V1 Unstable
 
-:: Source Code
+
 set "pastebin_url=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/CarbonRaw.bat"
 
 
@@ -11,7 +11,7 @@ set "target_file=%target_dir%\CARBON_ClientApp.bat"
 set "theme_file=%target_dip%\theme.txt"
 
 
-set "default_color=05" :: Purple
+set "default_color=08" :: Purple
 
 
 if not exist "%target_dir%" (
