@@ -1,1 +1,3 @@
-List
+cat ; https://raw.githubusercontent.com/yourusername/yourrepo/branch/cat.bat
+dog ; https://raw.githubusercontent.com/yourusername/yourrepo/branch/dog.bat
+
