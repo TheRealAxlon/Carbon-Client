@@ -1,2 +1,2 @@
-cat ; https://raw.githubusercontent.com/yourusername/yourrepo/branch/cat.bat
-dog ; https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/Apps/Tools/Miew.bat
+cat;https://raw.githubusercontent.com/yourusername/yourrepo/branch/cat.bat
+dog;https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/Apps/Tools/Miew.bat
