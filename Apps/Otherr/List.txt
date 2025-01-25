@@ -1,1 +1,1 @@
-AsciiTheater;https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/Apps/Tools/AsciiTheater.bat
+AsciiTheater;https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/Apps/Otherr/AsciiTheater.bat
