@@ -12,7 +12,7 @@ set "client_app="%source_folder%\CARBON_ClientApp.bat""
 :main_menu
 cls
 echo ============================
-echo        CARBON Main Menu
+echo           Tools
 echo ============================
 echo [1] Open Tools
 echo [2] Open Other Apps
