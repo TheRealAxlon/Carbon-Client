@@ -1,6 +1,8 @@
 # Carbon-Client
 
 
-A Neat Updated Utillity Tool To keep your Windows Pc
-Optimised Healthy And Ready to Game. With some aditional Tweaks
-you can do or you can Choose the presets!
+Bat Executer With Advanced Features With Deep Seek,
+
+For Developers, For gamers.
+
+Batch Simple https://therealaxlon.github.io/Carbon-Web/
