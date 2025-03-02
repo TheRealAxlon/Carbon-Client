@@ -5,12 +5,14 @@ title CARBON - Open Apps
 set "base_folder=%USERPROFILE%\Documents\CARBON"
 set "tools_folder=%base_folder%\Data\Tools"
 set "other_folder=%base_folder%\Data\Other"
+set "source_folder=%base_folder%\Source"
+set "client_app="%source_folder%\CARBON_ClientApp.bat""
 
-:: Main Menu to choose between Tools or Other Apps
+:: Main Menu to choose between Tools, Other Apps, or Source Folder
 :main_menu
 cls
 echo ============================
-echo        Open Apps
+echo        CARBON Main Menu
 echo ============================
 echo [1] Open Tools
 echo [2] Open Other Apps
@@ -20,7 +22,7 @@ set /p choice="Select an option: "
 
 if "%choice%"=="1" goto open_tools
 if "%choice%"=="2" goto open_other
-if "%choice%"=="3" exit
+if "%choice%"=="3" goto back_to_main_menu
 
 goto main_menu
 
@@ -113,3 +115,13 @@ for /L %%I in (1,1,%count%-1) do (
 echo Invalid option. Please try again.
 pause
 goto open_other
+
+
+:back_to_main_menu
+cls
+echo ============================
+echo        CARBON Main Menu
+echo ============================
+:: Close the current command prompt window and open CARBON_ClientApp.bat
+exit
+start "" "%client_app%"
