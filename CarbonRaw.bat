@@ -4,27 +4,40 @@ title CARBON
 chcp 65001 >nul
 cls
 
-:: Check if the CARBON folder exists in Documents, if not, create it
-set "folder=%USERPROFILE%\Documents\CARBON"
-set "foldero=%USERPROFILE%\Documents\CARBON\Pref"
-set "addons_folder=%folder%\Addons"
-if not exist "%folder%" mkdir "%folder%"
-if not exist "%foldero%" mkdir "%foldero%"
-if not exist "%addons_folder%" mkdir "%addons_folder%"
+:: Set necessary variables
+set "base_folder=%USERPROFILE%\Documents\CARBON"
+set "pref_folder=%base_folder%\Pref"
+set "addons_folder=%base_folder%\Addons"
+set "tools_folder=%base_folder%\Data\Tools"
+set "other_folder=%base_folder%\Data\Other"
+set "temp_folder=%base_folder%\Data\Temp"
+set "news_url=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/Exper/NewsDataStatus.txt"
+set "news_file=%temp_folder%\MenuText"
 
-set "color_file=%foldero%\theme.txt"
+:: Ensure necessary folders exist
+if not exist "%base_folder%" mkdir "%base_folder%"
+if not exist "%pref_folder%" mkdir "%pref_folder%"
+if not exist "%addons_folder%" mkdir "%addons_folder%"
+if not exist "%tools_folder%" mkdir "%tools_folder%"
+if not exist "%other_folder%" mkdir "%other_folder%"
+if not exist "%temp_folder%" mkdir "%temp_folder%"
+
+:: Fetch the latest news content
+curl -s "%news_url%" -o "%news_file%"
+
+:: Check if the news file was downloaded successfully
+if exist "%news_file%" (
+    set /p news_content=<"%news_file%"
+) else (
+    set "news_content=Still In testing"
+)
+
+:: Load theme color
+set "color_file=%pref_folder%\theme.txt"
 if exist "%color_file%" (
     for /f "delims=" %%A in (%color_file%) do set "theme_color=%%A"
 ) else (
     set "theme_color=08" :: Default color if no theme is saved
-)
-
-:: Load time format settings if they exist
-set "time_format_file=%folder%\time_format.txt"
-if exist "%time_format_file%" (
-    for /f "delims=" %%A in (%time_format_file%) do set "time_format=%%A"
-) else (
-    set "time_format=12" :: Default time format
 )
 
 :: Apply saved color
@@ -46,57 +59,56 @@ ping localhost -n 1 >nul
 echo ============================
 echo         Carbon v1.1.3 Beta
 echo ============================
-echo      Still In testing
+echo    %news_content%
 echo ============================
-echo     #═╦═══════»  [Settings]  [1]
-echo       ╚═╦══════»  [Tools]     [2]
-echo         ╚═╦═════»   [Fun]      [3]
-echo           ╚═╦═════»  [Addons]   [4]
-echo             ╚═╦═════» [Exit]     [5]
+echo    [Settings]         [1]
+echo    [Tools]            [2]
+echo    [Download]         [3]
+echo    [Addons]           [4]
+echo    [Exit]             [5]
 echo ----------------------------
 set /p choice="Select an option: "
 if "%choice%"=="1" goto settings
-if "%choice%"=="2" goto tools
-if "%choice%"=="3" goto fun
+if "%choice%"=="2" goto ToolsMenu
+if "%choice%"=="3" goto Download
 if "%choice%"=="4" goto addons
 if "%choice%"=="5" exit
 if /i "%choice%"=="DEV0" goto developer_settings
+
+
 
 :settings
 cls
 echo ============================
 echo          Settings
 echo ============================
-ping localhost -n 2 >nul
-echo     #═╦═══════»  [Carbon Settings]  [1]
-ping localhost -n 1 >nul
-echo       ╚═╦══════»  [PC Settings]     [2]
-ping localhost -n 1 >nul
-echo         ╚═╦═════»  [Back]           [3]
-ping localhost -n 1 >nul
+echo    [Carbon Settings]  [1]
+echo    [Back]             [2]
 echo ----------------------------
 set /p settings_choice="Select an option: "
 if "%settings_choice%"=="1" goto carbon_settings
-if "%settings_choice%"=="2" goto pc_settings
-if "%settings_choice%"=="3" goto start
+if "%settings_choice%"=="2" goto start
 
-:fun
+
+
+
+:ToolsMenu
 cls
 echo ============================
-echo          Fun
+echo         Tools
 echo ============================
-ping localhost -n 2 >nul
-echo     #═╦═══════»  [Soundboard] Beta [1]
-ping localhost -n 1 >nul
-echo       ╚═╦══════»  [Play Movie]     [2]
-ping localhost -n 1 >nul
-echo         ╚═╦═════»  [Back]          [3]
-ping localhost -n 1 >nul
+echo    [Tools]    [1]
+echo     [Other]    [2]
+echo    [Back]    [3]
 echo ----------------------------
 set /p settings_choice="Select an option: "
-if "%settings_choice%"=="1" goto Soundboard
-if "%settings_choice%"=="2" goto Movie
+if "%settings_choice%"=="1" goto Tools
+if "%settings_choice%"=="2" goto Other
 if "%settings_choice%"=="3" goto start
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
 
 :addons
 cls
@@ -104,6 +116,14 @@ echo ============================
 echo          Addons
 echo ============================
 
+:: Define the Addons folder path
+set "addons_folder=%USERPROFILE%\Documents\CARBON\Addons"
+
+:: Ensure the Addons folder exists
+if not exist "%addons_folder%" (
+    echo The Addons folder does not exist. Creating it now...
+    mkdir "%addons_folder%"
+)
 
 :: List available addons
 setlocal enabledelayedexpansion
@@ -124,7 +144,11 @@ echo [!count!] Back to Main Menu
 
 :: Prompt user for choice
 set /p addon_choice="Select an option: "
+
+:: Handle Back to Main Menu
 if "!addon_choice!"=="%count%" goto start
+
+:: Handle Open Addons Folder
 if "!addon_choice!"=="%count%-1" (
     echo Opening Addons folder...
     start "" "%addons_folder%"
@@ -132,7 +156,7 @@ if "!addon_choice!"=="%count%-1" (
     goto addons
 )
 
-:: Run the selected addon
+:: Handle running the selected addon
 for /L %%I in (1,1,%count%-2) do (
     if "!addon_choice!"=="%%I" (
         echo Running addon: !addon%%I!
@@ -142,56 +166,18 @@ for /L %%I in (1,1,%count%-2) do (
     )
 )
 
-:: Invalid option handling
+:: Handle invalid input
 echo Invalid option. Please try again.
 pause
 goto addons
 
 
-:clear_temp
-cls
-echo ============================
-echo        Clear Temp Folder
-cls
-echo ============================
-echo This will delete all files and subfolders in your temp folder.
-echo -----------------------------------------
-echo Temp Folder: %TEMP%
-echo -----------------------------------------
-set /p confirm="Do you want to proceed? (y/n): "
-if /i "%confirm%"=="y" (
-    echo Deleting files in %TEMP%...
-    rd /s /q "%TEMP%"
-    mkdir "%TEMP%" :: Recreate the temp folder
-    echo Temp folder cleared successfully.
-    pause
-    goto main
-) else (
-    echo Operation cancelled.
-    pause
-    goto main
-)
 
 
-:movie
-cls
-echo ============================
-echo          Movie Mode
-cls
-echo ============================
-echo Connecting to watch.ascii.theater...
-echo -----------------------------------------
-echo Ensure you have SSH installed and set up properly.
-echo -----------------------------------------
-pause
 
-:: Run the SSH command
-ssh -o StrictHostKeyChecking=no watch.ascii.theater
+:: //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
-echo -----------------------------------------
-echo Movie playback ended. Returning to main menu.
-pause
-goto main
+
 
 
 
@@ -213,48 +199,8 @@ if "%carbon_choice%"=="1" goto change_theme
 if "%carbon_choice%"=="2" goto uninstall
 if "%carbon_choice%"=="3" goto settings
 
-:pc_settings
-cls
-echo ============================
-echo         PC Settings
-echo ============================
-ping localhost -n 2 >nul
-echo     #═╦═══════»  [Change Time Format]  [1]
-ping localhost -n 1 >nul
-echo       ╚═╦══════»  [Clear Temp]          [2]
-ping localhost -n 1 >nul
-echo       ╚═╦══════»  [Back]                 [3]
-echo ----------------------------
-set /p pc_choice="Select an option: "
-if "%pc_choice%"=="1" goto change_time_format
-if "%pc_choice%"=="2" goto clear_temp
-if "%pc_choice%"=="3" goto settings
 
-:change_time_format
-cls
-echo ============================
-echo     Change Time Format
-echo ============================
-echo Current Time Format: %time_format%-hour
-ping localhost -n 1 >nul
-echo [1] Switch to 12-hour format
-ping localhost -n 1 >nul
-echo [2] Switch to 24-hour format 
-ping localhost -n 1 >nul
-echo ----------------------------
-set /p time_choice="Select an option: "
-if "%time_choice%"=="1" (
-    set "time_format=12"
-    echo 12 > "%time_format_file%"
-    powershell -Command "$wshell = New-Object -ComObject WScript.Shell; $wshell.Popup('Time Format Set to 12-hour format', 0, 'Time Format', 0x0)"
-)
-if "%time_choice%"=="2" (
-    set "time_format=24"
-    echo 24 > "%time_format_file%"
-    powershell -Command "$wshell = New-Object -ComObject WScript.Shell; $wshell.Popup('Time Format Set to 24-hour format', 0, 'Time Format', 0x0)"
-)
-pause
-goto pc_settings
+
 
 :change_theme
 cls
@@ -290,12 +236,15 @@ powershell -Command "$wshell = New-Object -ComObject WScript.Shell; $wshell.Popu
 color %theme_color%
 goto carbon_settings
 
+
+
+
 :uninstall
 cls
 echo ============================
 echo        Uninstall Carbon
 echo ============================
-echo This will delete the CARBON folder from Documents.
+echo This will delete the CARBON
 set /p confirm="Are you sure? (yes/no): "
 if /i "%confirm%"=="yes" (
     rmdir /s /q "%folder%"
@@ -309,57 +258,255 @@ if /i "%confirm%"=="yes" (
     goto carbon_settings
 )
 
-:tools
+
+
+
+
+
+:: //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+
+
+
+
+:Download
+cls
+echo ============================
+echo     Download Carbon Apps
+echo ============================
+echo [1] Tools Apps
+echo [2] Other Apps
+echo [3] Menu
+echo ============================
+set /p menu_choice="Select an option: "
+
+if "%menu_choice%"=="1" goto Download_Tools
+if "%menu_choice%"=="2" goto Download_Other
+if "%menu_choice%"=="3" goto Start
+
+
+:: Handle invalid input in Main Menu
+echo Invalid choice. Please try again.
+pause
+goto Download
+
+
+
+:Other
+cls
+echo ============================
+echo          Other
+echo ============================
+
+:: List available items in "Other"
+setlocal enabledelayedexpansion
+set /a count=0
+for %%A in ("%other_folder%\*.bat") do (
+    set /a count+=1
+    echo [!count!] %%~nA
+    set "tool!count!=%%A"
+)
+
+:: Add option to return to the main menu
+set /a count+=1
+echo [!count!] Back to Main Menu
+
+:: Prompt user for choice
+set /p tool_choice="Select an option: "
+if "!tool_choice!"=="%count%" goto start
+
+:: Run the selected tool
+for /L %%I in (1,1,%count%-1) do (
+    if "!tool_choice!"=="%%I" (
+        echo Running item: !tool%%I!
+        call "!tool%%I!"
+        pause
+        goto Other
+    )
+)
+
+:: Invalid option handling
+echo Invalid option. Please try again.
+pause
+goto Other
+
+
+
+:Tools
 cls
 echo ============================
 echo          Tools
 echo ============================
-ping localhost -n 1 >nul
-echo [1] Steam VR
-ping localhost -n 1 >nul
-echo [2] Go to BIOS/OBBs
-ping localhost -n 1 >nul
-echo [3] Timed Shutdown
-ping localhost -n 1 >nul
-echo [4] Back
-echo ----------------------------
-set /p tool_choice="Select a tool: "
-if "%tool_choice%"=="1" goto steam_vr
-if "%tool_choice%"=="2" goto bios
-if "%tool_choice%"=="3" goto timed_shutdown
-if "%tool_choice%"=="4" goto start
 
-:steam_vr
-cls
-echo ============================
-echo       Launch Steam VR
-echo ============================
-ping localhost -n 1 >nul
-echo Opening Steam VR...
-start steam://rungameid/250820
-ping localhost -n 2 >nul
-pause
-goto tools
-
-:bios
-cls
-echo ============================
-echo        Go to BIOS/OBBs
-cls
-echo ============================
-echo This will restart your computer and enter the BIOS/UEFI settings.
-echo Please save all your work before proceeding.
-echo -----------------------------------------
-set /p confirm="Do you want to continue? (y/n): "
-if /i "%confirm%"=="y" (
-    echo Restarting to BIOS...
-    shutdown /r /fw /t 0
-    exit
-) else (
-    echo Operation cancelled.
-    pause
-    goto tools
+:: List available tools
+setlocal enabledelayedexpansion
+set /a count=0
+for %%A in ("%tools_folder%\*.bat") do (
+    set /a count+=1
+    echo [!count!] %%~nA
+    set "tool!count!=%%A"
 )
+
+:: Add option to return to the main menu
+set /a count+=1
+echo [!count!] Back to Main Menu
+
+:: Prompt user for choice
+set /p tool_choice="Select an option: "
+if "!tool_choice!"=="%count%" goto start
+
+:: Run the selected tool
+for /L %%I in (1,1,%count%-1) do (
+    if "!tool_choice!"=="%%I" (
+        echo Running tool: !tool%%I!
+        call "!tool%%I!"
+        pause
+        goto Tools
+    )
+)
+
+:: Invalid option handling
+echo Invalid option. Please try again.
+pause
+goto Tools
+
+
+
+
+
+
+
+
+
+:Download_Tools
+cls
+echo ============================
+echo        Download Tools
+echo ============================
+
+:: Define folder paths
+set "temp_folder=%USERPROFILE%\Documents\CARBON\Data\Temp\DLnames"
+set "github_list_link=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/Apps/Tools/List.txt"
+
+:: Ensure necessary folders exist
+if not exist "%temp_folder%" mkdir "%temp_folder%"
+
+:: Download tools list quietly
+curl -s "%github_list_link%" -o "%temp_folder%\tools_list.txt"
+
+:: Check if list file exists
+if not exist "%temp_folder%\tools_list.txt" (
+    echo Failed to fetch the tools list. Returning to Main Menu.
+    pause
+    goto start
+)
+
+:: Display available tools for download
+echo Select a tool to download:
+echo ============================
+set /a download_tool_count=0
+setlocal enabledelayedexpansion
+for /f "tokens=1,* delims=;" %%A in ('type "%temp_folder%\tools_list.txt"') do (
+    set /a download_tool_count+=1
+    set "download_tool_name!download_tool_count!=%%A"
+    set "download_tool_url!download_tool_count!=%%B"
+    echo [!download_tool_count!] %%A
+)
+
+:: Prompt user to select a tool to download
+echo.
+set /p download_choice="Enter the number of the tool to download or press Enter to go back: "
+if "%download_choice%"=="" goto Tools
+
+:: Process the selected tool
+for /L %%I in (1,1,%download_tool_count%) do (
+    if "!download_choice!"=="%%I" (
+        set "tool_name=!download_tool_name%%I!"
+        set "tool_url=!download_tool_url%%I!"
+        echo Downloading tool: !tool_name!
+        curl -s "!tool_url!" -o "%tools_folder%\!tool_name!.bat"
+        if exist "%tools_folder%\!tool_name!.bat" (
+            echo Tool downloaded successfully: !tool_name!
+        ) else (
+            echo Failed to download tool: !tool_name!. Please check the URL or your internet connection.
+        )
+        pause
+        goto Download
+    )
+)
+
+:Download_Other
+cls
+echo ============================
+echo        Download Other
+echo ============================
+
+:: Define folder paths
+set "temp_folder=%USERPROFILE%\Documents\CARBON\Data\Temp\DLnames"
+set "github_list_link=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/Apps/Otherr/List.txt"
+
+:: Ensure necessary folders exist
+if not exist "%temp_folder%" mkdir "%temp_folder%"
+if not exist "%other_folder%" mkdir "%other_folder%"
+
+:: Download tools list quietly
+curl -s "%github_list_link%" -o "%temp_folder%\tools_list.txt"
+
+:: Check if list file exists
+if not exist "%temp_folder%\tools_list.txt" (
+    echo Failed to fetch the Other list. Returning to Main Menu.
+    pause
+    goto start
+)
+
+:: Display available tools for download
+echo Select a tool to download:
+echo ============================
+set /a download_tool_count=0
+setlocal enabledelayedexpansion
+for /f "tokens=1,* delims=;" %%A in ('type "%temp_folder%\tools_list.txt"') do (
+    set /a download_tool_count+=1
+    set "download_tool_name!download_tool_count!=%%A"
+    set "download_tool_url!download_tool_count!=%%B"
+    echo [!download_tool_count!] %%A
+)
+
+:: Prompt user to select a tool to download
+echo.
+set /p download_choice="Enter the number of the tool to download or press Enter to go back: "
+if "%download_choice%"=="" goto Tools
+
+:: Process the selected tool
+for /L %%I in (1,1,%download_tool_count%) do (
+    if "!download_choice!"=="%%I" (
+        set "tool_name=!download_tool_name%%I!"
+        set "tool_url=!download_tool_url%%I!"
+        echo Downloading tool: !tool_name!
+        curl -s "!tool_url!" -o "%other_folder%\!tool_name!.bat"
+        if exist "%other_folder%\!tool_name!.bat" (
+            echo Tool downloaded successfully: !tool_name!
+        ) else (
+            echo Failed to download tool: !tool_name!. Please check the URL or your internet connection.
+        )
+        pause
+        goto Download_Other
+    )
+)
+
+echo Invalid choice. Please try again.
+pause
+goto Download
+
+
+
+
+
+
+
+
+
+:: ////////////////////////////////////////////////////////////////////////////
+
+
 
 :developer_settings
 cls
@@ -417,112 +564,6 @@ goto developer_settings
 
 
 
-
-
-
-:timed_shutdown
-cls
-echo ============================
-echo       Timed Shutdown
-cls
-echo ============================
-echo Enter the time in seconds for the shutdown:
-set /p shutdown_time="Time (in seconds): "
-if "%shutdown_time%" NEQ "" (
-    powershell -Command "$wshell = New-Object -ComObject WScript.Shell; $wshell.Popup('Your system will shut down in %shutdown_time% seconds', 0, 'Timed Shutdown', 0x0)"
-    shutdown -s -t %shutdown_time%
-    echo Shutdown scheduled in %shutdown_time% seconds.
-) else (
-    echo Invalid input. No shutdown scheduled.
-)
-
-
-:soundboard
-cls
-echo ============================
-echo        Carbon Soundboard
-cls
-echo ============================
-echo This will allow you to play sounds through your mic.
-echo The sounds will be saved in DOCUMENTS/CARBON/Soundboard.
-echo -----------------------------------------
-echo Downloading sounds, please wait...
-
-:: Set up the directories
-set "soundboardDir=%USERPROFILE%\Documents\CARBON\Soundboard"
-if not exist "%soundboardDir%" mkdir "%soundboardDir%"
-
-:: URLs for the sound files
-set "sound1=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/main/Sounds/caramell.mp3"
-set "sound2=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/main/Sounds/F!EN.mp3"
-
-:: Download sounds
-curl -o "%soundboardDir%\caramell.mp3" %sound1%
-curl -o "%soundboardDir%\F!EN.mp3" %sound2%
-echo Sounds downloaded and saved in "%soundboardDir%".
-pause
-
-:soundboard
-cls
-echo ============================
-echo        Carbon Soundboard
-cls              Beta
-echo ============================
-echo This will allow you to play sounds through your current microphone.
-echo The sounds will be saved in DOCUMENTS/CARBON/Soundboard.
-echo -----------------------------------------
-echo Downloading sounds, please wait...
-
-:: Set up the directories
-set "soundboardDir=%USERPROFILE%\Documents\CARBON\Soundboard"
-if not exist "%soundboardDir%" mkdir "%soundboardDir%"
-
-:: URLs for the sound files
-set "sound1=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/main/Sounds/caramell.mp3"
-set "sound2=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/main/Sounds/F!EN.mp3"
-
-:: Download sounds
-curl -o "%soundboardDir%\caramell.mp3" %sound1%
-curl -o "%soundboardDir%\F!EN.mp3" %sound2%
-echo Sounds downloaded and saved in "%soundboardDir%".
-pause
-
-:menu
-cls
-echo ============================
-echo    Soundboard Menu Experemental
-echo ============================
-echo 1. Play Caramell
-echo 2. Play F!EN
-echo 3. Exit
-echo ============================
-set /p choice="Choose an option (1-3): "
-
-if "%choice%"=="1" (
-    call :playSound "%soundboardDir%\caramell.mp3"
-) else if "%choice%"=="2" (
-    call :playSound "%soundboardDir%\F!EN.mp3"
-) else if "%choice%"=="3" (
-    echo Exiting Soundboard...
-    exit
-) else (
-    echo Invalid choice. Try again.
-    pause
-    goto menu
-)
-
-:playSound
-cls
-if not exist "%~1" (
-    echo Error: File not found - "%~1"
-    pause
-    goto menu
-)
-
-echo Playing %~1 through your default media player...
-start wmplayer "%~1"
-pause
-goto menu
 
 
 
