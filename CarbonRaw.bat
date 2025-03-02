@@ -70,47 +70,29 @@ echo    [Exit]             [5]
 echo ----------------------------
 set /p choice="Select an option: "
 if "%choice%"=="1" goto settings
-if "%choice%"=="2" goto open_tools_menu
+if "%choice%"=="2" goto open_tools
 if "%choice%"=="3" goto Download
 if "%choice%"=="4" goto addons
 if "%choice%"=="5" exit
 if /i "%choice%"=="DEV0" goto developer_settings
 
-:: Open Tools or Other Apps Menu
-:open_tools_menu
+:: Open Tools
+:open_tools
 cls
 echo ============================
-echo        Open Apps
+echo        Open Tools
 echo ============================
-echo [1] Open Tools
-echo [2] Open Other Apps
-echo [3] Back to Main Menu
-echo ============================
-set /p choice="Select an option: "
-
-if "%choice%"=="1" (
-    if exist "%open_apps_file%" (
-        call "%open_apps_file%"
-    ) else (
-        echo Error: open_apps.bat not found!
-        pause
-    )
+if exist "%open_apps_file%" (
+    call "%open_apps_file%"
+) else (
+    echo Error: tloder.bat not found!
+    pause
 )
+goto start
 
-if "%choice%"=="2" (
-    if exist "%open_apps_file%" (
-        call "%open_apps_file%"
-    ) else (
-        echo Error: open_apps.bat not found!
-        pause
-    )
-)
 
-if "%choice%"=="3" goto start
 
-goto open_tools_menu
 
-:: Addons Section
 :addons
 cls
 echo ============================
@@ -250,3 +232,297 @@ if /i "%confirm%"=="yes" (
     pause
     goto carbon_settings
 )
+
+
+
+:Download
+cls
+echo ============================
+echo     Download Carbon Apps
+echo ============================
+echo [1] Tools Apps
+echo [2] Other Apps
+echo [3] Menu
+echo ============================
+set /p menu_choice="Select an option: "
+
+if "%menu_choice%"=="1" goto Download_Tools
+if "%menu_choice%"=="2" goto Download_Other
+if "%menu_choice%"=="3" goto Start
+
+
+:: Handle invalid input in Main Menu
+echo Invalid choice. Please try again.
+pause
+goto Download
+
+
+
+:Other
+cls
+echo ============================
+echo          Other
+echo ============================
+
+:: List available items in "Other"
+setlocal enabledelayedexpansion
+set /a count=0
+for %%A in ("%other_folder%\*.bat") do (
+    set /a count+=1
+    echo [!count!] %%~nA
+    set "tool!count!=%%A"
+)
+
+:: Add option to return to the main menu
+set /a count+=1
+echo [!count!] Back to Main Menu
+
+:: Prompt user for choice
+set /p tool_choice="Select an option: "
+if "!tool_choice!"=="%count%" goto start
+
+:: Run the selected tool
+for /L %%I in (1,1,%count%-1) do (
+    if "!tool_choice!"=="%%I" (
+        echo Running item: !tool%%I!
+        call "!tool%%I!"
+        pause
+        goto Other
+    )
+)
+
+:: Invalid option handling
+echo Invalid option. Please try again.
+pause
+goto Other
+
+
+
+:Tools
+cls
+echo ============================
+echo          Tools
+echo ============================
+
+:: List available tools
+setlocal enabledelayedexpansion
+set /a count=0
+for %%A in ("%tools_folder%\*.bat") do (
+    set /a count+=1
+    echo [!count!] %%~nA
+    set "tool!count!=%%A"
+)
+
+:: Add option to return to the main menu
+set /a count+=1
+echo [!count!] Back to Main Menu
+
+:: Prompt user for choice
+set /p tool_choice="Select an option: "
+if "!tool_choice!"=="%count%" goto start
+
+:: Run the selected tool
+for /L %%I in (1,1,%count%-1) do (
+    if "!tool_choice!"=="%%I" (
+        echo Running tool: !tool%%I!
+        call "!tool%%I!"
+        pause
+        goto Tools
+    )
+)
+
+:: Invalid option handling
+echo Invalid option. Please try again.
+pause
+goto Tools
+
+
+
+
+
+
+
+
+
+:Download_Tools
+cls
+echo ============================
+echo        Download Tools
+echo ============================
+
+:: Define folder paths
+set "temp_folder=%USERPROFILE%\Documents\CARBON\Data\Temp\DLnames"
+set "github_list_link=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/Apps/Tools/List.txt"
+
+:: Ensure necessary folders exist
+if not exist "%temp_folder%" mkdir "%temp_folder%"
+
+:: Download tools list quietly
+curl -s "%github_list_link%" -o "%temp_folder%\tools_list.txt"
+
+:: Check if list file exists
+if not exist "%temp_folder%\tools_list.txt" (
+    echo Failed to fetch the tools list. Returning to Main Menu.
+    pause
+    goto start
+)
+
+:: Display available tools for download
+echo Select a tool to download:
+echo ============================
+set /a download_tool_count=0
+setlocal enabledelayedexpansion
+for /f "tokens=1,* delims=;" %%A in ('type "%temp_folder%\tools_list.txt"') do (
+    set /a download_tool_count+=1
+    set "download_tool_name!download_tool_count!=%%A"
+    set "download_tool_url!download_tool_count!=%%B"
+    echo [!download_tool_count!] %%A
+)
+
+:: Prompt user to select a tool to download
+echo.
+set /p download_choice="Enter the number of the tool to download or press Enter to go back: "
+if "%download_choice%"=="" goto Tools
+
+:: Process the selected tool
+for /L %%I in (1,1,%download_tool_count%) do (
+    if "!download_choice!"=="%%I" (
+        set "tool_name=!download_tool_name%%I!"
+        set "tool_url=!download_tool_url%%I!"
+        echo Downloading tool: !tool_name!
+        curl -s "!tool_url!" -o "%tools_folder%\!tool_name!.bat"
+        if exist "%tools_folder%\!tool_name!.bat" (
+            echo Tool downloaded successfully: !tool_name!
+        ) else (
+            echo Failed to download tool: !tool_name!. Please check the URL or your internet connection.
+        )
+        pause
+        goto Download
+    )
+)
+
+:Download_Other
+cls
+echo ============================
+echo        Download Other
+echo ============================
+
+:: Define folder paths
+set "temp_folder=%USERPROFILE%\Documents\CARBON\Data\Temp\DLnames"
+set "github_list_link=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/Apps/Otherr/List.txt"
+
+:: Ensure necessary folders exist
+if not exist "%temp_folder%" mkdir "%temp_folder%"
+if not exist "%other_folder%" mkdir "%other_folder%"
+
+:: Download tools list quietly
+curl -s "%github_list_link%" -o "%temp_folder%\tools_list.txt"
+
+:: Check if list file exists
+if not exist "%temp_folder%\tools_list.txt" (
+    echo Failed to fetch the Other list. Returning to Main Menu.
+    pause
+    goto start
+)
+
+:: Display available tools for download
+echo Select a tool to download:
+echo ============================
+set /a download_tool_count=0
+setlocal enabledelayedexpansion
+for /f "tokens=1,* delims=;" %%A in ('type "%temp_folder%\tools_list.txt"') do (
+    set /a download_tool_count+=1
+    set "download_tool_name!download_tool_count!=%%A"
+    set "download_tool_url!download_tool_count!=%%B"
+    echo [!download_tool_count!] %%A
+)
+
+:: Prompt user to select a tool to download
+echo.
+set /p download_choice="Enter the number of the tool to download or press Enter to go back: "
+if "%download_choice%"=="" goto Tools
+
+:: Process the selected tool
+for /L %%I in (1,1,%download_tool_count%) do (
+    if "!download_choice!"=="%%I" (
+        set "tool_name=!download_tool_name%%I!"
+        set "tool_url=!download_tool_url%%I!"
+        echo Downloading tool: !tool_name!
+        curl -s "!tool_url!" -o "%other_folder%\!tool_name!.bat"
+        if exist "%other_folder%\!tool_name!.bat" (
+            echo Tool downloaded successfully: !tool_name!
+        ) else (
+            echo Failed to download tool: !tool_name!. Please check the URL or your internet connection.
+        )
+        pause
+        goto Download_Other
+    )
+)
+
+echo Invalid choice. Please try again.
+pause
+goto Download
+
+
+
+
+
+
+
+
+
+:: ////////////////////////////////////////////////////////////////////////////
+
+
+
+:developer_settings
+cls
+echo ============================
+echo      Carbon Developer Settings
+echo ============================
+ping localhost -n 2 >nul
+echo Type the following commands to access settings:
+ping localhost -n 1 >nul
+echo [folderdev] Open Carbon Folder
+ping localhost -n 1 >nul
+echo [collordev] Apply Custom Theme Color
+ping localhost -n 1 >nul
+echo [versiondev] View Carbon Version
+ping localhost -n 1 >nul
+echo [backdev] Back to Main Menu
+echo ----------------------------
+set /p dev_command="Type a command: "
+
+if /i "%dev_command%"=="folderdev" goto folderdev
+if /i "%dev_command%"=="collordev" goto collordev
+if /i "%dev_command%"=="versiondev" goto versiondev
+if /i "%dev_command%"=="backdev" goto start
+
+goto developer_settings
+
+:folderdev
+start "" "%folder%"
+goto developer_settings
+
+:collordev
+cls
+echo ============================
+echo    Apply Custom Theme Color
+echo ============================
+echo Enter a 2-digit color code (e.g., 01, 02, etc.):
+set /p theme_color="Color Code: "
+echo %theme_color% > "%color_file%"
+color %theme_color%
+goto developer_settings
+
+:versiondev
+cls
+echo ============================
+echo          Carbon Version
+echo ============================
+echo Carbon State: 
+echo Folder Path: %color_file%
+echo Theme Color: %theme_color%
+pause
+goto developer_settings
+
