@@ -1,24 +1,39 @@
-Param(
-    [string]$Title = "Notification",
-    [string]$Message = "Message"
-)
+function Show-CustomMessageBox {
+    param (
+        [string]$Message,
+        [string]$Title = "Notification",
+        [string]$BackgroundColor = "#FFFFFF", # Default to white
+        [string]$TextColor = "#000000"       # Default to black
+    )
 
-try {
-    Add-Type -AssemblyName System.Runtime.WindowsRuntime -ErrorAction Stop
-} catch {
-    Write-Host "Error loading Windows Runtime assembly."
+    Add-Type -AssemblyName System.Windows.Forms
+    Add-Type -AssemblyName System.Drawing
+
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = $Title
+    $form.StartPosition = "CenterScreen"
+    $form.Size = New-Object System.Drawing.Size(300, 150)
+    $form.FormBorderStyle = "FixedDialog"
+    $form.MaximizeBox = $false
+    $form.MinimizeBox = $false
+
+    # Convert hex color codes to System.Drawing.Color
+    $bgColor = [System.Drawing.ColorTranslator]::FromHtml($BackgroundColor)
+    $txtColor = [System.Drawing.ColorTranslator]::FromHtml($TextColor)
+
+    $form.BackColor = $bgColor
+
+    $label = New-Object System.Windows.Forms.Label
+    $label.Text = $Message
+    $label.AutoSize = $true
+    $label.BackColor = $bgColor
+    $label.ForeColor = $txtColor
+    $label.Font = New-Object System.Drawing.Font("Arial", 12)
+    $label.TextAlign = "MiddleCenter"
+    $label.Dock = "Fill"
+
+    $form.Controls.Add($label)
+    $form.Topmost = $true
+
+    $null = $form.ShowDialog()
 }
-
-# Get the toast template (ToastText02 provides two text elements)
-$templateType = [Windows.UI.Notifications.ToastTemplateType]::ToastText02
-$template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent($templateType)
-
-# Set the title and message in the template
-$textNodes = $template.GetElementsByTagName("text")
-$textNodes.Item(0).AppendChild($template.CreateTextNode($Title)) | Out-Null
-$textNodes.Item(1).AppendChild($template.CreateTextNode($Message)) | Out-Null
-
-# Create and show the toast notification
-$toast = [Windows.UI.Notifications.ToastNotification]::new($template)
-$notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("CARBON X ASSIST")
-$notifier.Show($toast)
