@@ -73,7 +73,7 @@ set /p choice="Select an option: "
 if "%choice%"=="1" goto settings
 if "%choice%"=="2" goto open_tools
 if "%choice%"=="3" goto Download
-if "%choice%"=="4" goto addons
+if "%choice%"=="4" goto adds
 if "%choice%"=="5" exit
 if /i "%choice%"=="DEV0" goto developer_settings
 
@@ -92,10 +92,10 @@ if exist "%open_apps_file%" (
 goto start
 
 :: Open Tools
-:open_tools
+:open_adds
 cls
 echo ============================
-echo        Open Tools
+echo        Open Addons
 echo ============================
 if exist "%open_adds_file%" (
     call "%open_adds_file%"
