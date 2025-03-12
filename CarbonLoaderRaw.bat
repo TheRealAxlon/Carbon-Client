@@ -1,9 +1,10 @@
 @echo off
-title CARBON LOADER V1 Unstable
+title CARBON LOADER V1 stableish
 
 :: Set URLs
 set "pastebin_url=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/CarbonRaw.bat"
 set "tloder_url=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/API/Tloader/tloder.bat"
+set "aloder_url=https://raw.githubusercontent.com/TheRealAxlon/Carbon-Client/refs/heads/main/API/Tloader/aloder.bat"
 
 :: Set file paths
 set "target_dir=%userprofile%\Documents\CARBON\Source"
@@ -11,6 +12,7 @@ set "target_dip=%userprofile%\Documents\CARBON\Pref"
 set "target_file=%target_dir%\CARBON_ClientApp.bat"
 set "theme_file=%target_dip%\theme.txt"
 set "tloder_file=%target_dir%\API\tloder.bat"
+set "aloder_file=%target_dir%\API\tloder.bat"
 
 :: Default theme color (Purple)
 set "default_color=08"
@@ -63,12 +65,23 @@ if not exist "%target_file%" (
     exit
 )
 
-:: Download tloder.bat for Tools
+echo Downloading aloder.bat...
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%tloder_url%', '%tloder_file%')" >nul 2>&1
+
+
 echo Downloading tloder.bat...
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%tloder_url%', '%tloder_file%')" >nul 2>&1
 
-:: Verify if tloder.bat was downloaded successfully
+
 if not exist "%tloder_file%" (
+    echo Error downloading tloder.bat. Exiting.
+    pause
+    exit
+)
+
+
+
+if not exist "%aloder_file%" (
     echo Error downloading tloder.bat. Exiting.
     pause
     exit
