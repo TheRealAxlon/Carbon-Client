@@ -12,7 +12,7 @@ set "target_dip=%userprofile%\Documents\CARBON\Pref"
 set "target_file=%target_dir%\CARBON_ClientApp.bat"
 set "theme_file=%target_dip%\theme.txt"
 set "tloder_file=%target_dir%\API\tloder.bat"
-set "aloder_file=%target_dir%\API\tloder.bat"
+set "aloder_file=%target_dir%\API\aloder.bat"
 
 :: Default theme color (Purple)
 set "default_color=08"
