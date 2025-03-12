@@ -70,7 +70,7 @@ powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%tloder_url
 
 
 echo Downloading tloder.bat...
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%tloder_url%', '%tloder_file%')" >nul 2>&1
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%aloder_url%', '%aloder_file%')" >nul 2>&1
 
 
 if not exist "%tloder_file%" (
@@ -82,7 +82,7 @@ if not exist "%tloder_file%" (
 
 
 if not exist "%aloder_file%" (
-    echo Error downloading tloder.bat. Exiting.
+    echo Error downloading aloder.bat. Exiting.
     pause
     exit
 )
