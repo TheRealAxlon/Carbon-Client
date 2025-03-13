@@ -3,7 +3,7 @@ title CARBON - Addons
 
 :: Define the Addons folder path
 set "addons_folder=%USERPROFILE%\Documents\CARBON\Addons"
-set "client_app=%USERPROFILE%\Documents\CARBON\Source\Addons\API\CARBON_ClientApp.bat"
+set "client_app=%USERPROFILE%\Documents\CARBON\CARBON_ClientApp.bat"
 
 :addons
 cls
